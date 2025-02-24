@@ -16,7 +16,7 @@ jobs:
       - run: pytest
 
   build:
-    needs: steps
+    needs: testing
     runs-on: ubuntu-latest
 
     permissions:
