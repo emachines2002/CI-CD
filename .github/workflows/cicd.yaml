@@ -16,6 +16,7 @@ jobs:
       - run: pytest
 
   build:
+    needs: steps
     runs-on: ubuntu-latest
 
     permissions:
@@ -45,3 +46,20 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+  deploy:
+    needs: build
+    name: deployer
+    runs-on: ubuntu-latest
+    steps:
+      - name: executing remote ssh commands using password
+        uses: appleboy/ssh-action@v1.2.1
+        with:
+          host: ${{ secrets.SECRET }}
+          username: yc-user
+          passphrase: ${{ secrets.SECRET_PAROL }}
+          key: ${{ secrets.SECRET_KEY }}
+          script: |
+            cd /home/yc-user/test_cicd
+            docker pull ghcr.io/emachines2002/ci-cd:main
+            docker compose down
+            docker compose up -d
